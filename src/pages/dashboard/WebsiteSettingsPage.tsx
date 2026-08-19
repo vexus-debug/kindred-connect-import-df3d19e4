@@ -12,7 +12,7 @@ import {
   Globe, Palette, Clock, Share2, Shield, MessageSquare, Camera, LayoutTemplate,
   BarChart3, Sparkle, UserRound, Quote, Receipt, HelpCircle, MapPin, Megaphone,
 } from "lucide-react";
-import { websiteTemplates, defaultTemplateId } from "@/config/websiteTemplates";
+import { websiteTemplates, defaultTemplateId, getTemplate } from "@/config/websiteTemplates";
 
 import {
   useClinicSettings, useUpdateClinicSettings,
@@ -99,10 +99,14 @@ export default function WebsiteSettingsPage() {
   };
 
   const selectedTemplate = (form.template as string) || (settings as any)?.template || defaultTemplateId;
+  const templatePalette = getTemplate(selectedTemplate).colors;
 
   const handleSelectTemplate = (id: string) => {
-    setForm({ ...form, template: id });
-    handleSave({ template: id });
+    // Apply the template's palette too, otherwise previously saved colour
+    // overrides keep the old theme colours on the public site.
+    const palette = getTemplate(id).colors;
+    setForm({ ...form, template: id, primary_color: palette.primary, accent_color: palette.accent });
+    handleSave({ template: id, primary_color: palette.primary, accent_color: palette.accent });
   };
 
 
@@ -457,32 +461,44 @@ export default function WebsiteSettingsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-medium">Primary Color</Label>
-                    <div className="flex items-center gap-2">
-                      <input type="color" className="h-8 w-8 rounded border border-border/40 cursor-pointer" value={get("primary_color") || "#2563eb"} onChange={(e) => set("primary_color", e.target.value)} />
-                      <Input className="bg-muted/30 border-border/40 flex-1" value={get("primary_color") || "#2563eb"} onChange={(e) => set("primary_color", e.target.value)} />
+                     <div className="flex items-center gap-2">
+                      <input type="color" className="h-8 w-8 rounded border border-border/40 cursor-pointer" value={get("primary_color") || templatePalette.primary} onChange={(e) => set("primary_color", e.target.value)} />
+                      <Input className="bg-muted/30 border-border/40 flex-1" value={get("primary_color") || templatePalette.primary} onChange={(e) => set("primary_color", e.target.value)} />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-medium">Accent Color</Label>
-                    <div className="flex items-center gap-2">
-                      <input type="color" className="h-8 w-8 rounded border border-border/40 cursor-pointer" value={get("accent_color") || "#1d4ed8"} onChange={(e) => set("accent_color", e.target.value)} />
-                      <Input className="bg-muted/30 border-border/40 flex-1" value={get("accent_color") || "#1d4ed8"} onChange={(e) => set("accent_color", e.target.value)} />
+                     <div className="flex items-center gap-2">
+                      <input type="color" className="h-8 w-8 rounded border border-border/40 cursor-pointer" value={get("accent_color") || templatePalette.accent} onChange={(e) => set("accent_color", e.target.value)} />
+                      <Input className="bg-muted/30 border-border/40 flex-1" value={get("accent_color") || templatePalette.accent} onChange={(e) => set("accent_color", e.target.value)} />
                     </div>
                   </div>
                 </div>
                 <div className="p-4 rounded-lg border border-border/40">
                   <p className="text-xs text-muted-foreground mb-2">Preview</p>
                   <div className="flex gap-3">
-                    <div className="h-10 w-20 rounded-md" style={{ backgroundColor: get("primary_color") || "#2563eb" }} />
-                    <div className="h-10 w-20 rounded-md" style={{ backgroundColor: get("accent_color") || "#1d4ed8" }} />
-                    <div className="h-10 flex-1 rounded-md flex items-center justify-center text-xs font-medium text-white" style={{ backgroundColor: get("primary_color") || "#2563eb" }}>
+                    <div className="h-10 w-20 rounded-md" style={{ backgroundColor: get("primary_color") || templatePalette.primary }} />
+                    <div className="h-10 w-20 rounded-md" style={{ backgroundColor: get("accent_color") || templatePalette.accent }} />
+                    <div className="h-10 flex-1 rounded-md flex items-center justify-center text-xs font-medium text-white" style={{ backgroundColor: get("primary_color") || templatePalette.primary }}>
                       Book Now
                     </div>
                   </div>
                 </div>
-                <Button className="bg-secondary hover:bg-secondary/90 shadow-lg shadow-secondary/20" onClick={() => handleSave()} disabled={updateClinic.isPending}>
-                  {updateClinic.isPending ? "Saving..." : "Save Colors"}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button className="bg-secondary hover:bg-secondary/90 shadow-lg shadow-secondary/20" onClick={() => handleSave()} disabled={updateClinic.isPending}>
+                    {updateClinic.isPending ? "Saving..." : "Save Colors"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={updateClinic.isPending}
+                    onClick={() => {
+                      setForm({ ...form, primary_color: templatePalette.primary, accent_color: templatePalette.accent });
+                      handleSave({ primary_color: templatePalette.primary, accent_color: templatePalette.accent });
+                    }}
+                  >
+                    Reset to template colours
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
