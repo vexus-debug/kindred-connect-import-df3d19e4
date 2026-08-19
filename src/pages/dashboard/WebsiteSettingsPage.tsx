@@ -12,7 +12,7 @@ import {
   Globe, Palette, Clock, Share2, Shield, MessageSquare, Camera, LayoutTemplate,
   BarChart3, Sparkle, UserRound, Quote, Receipt, HelpCircle, MapPin, Megaphone,
 } from "lucide-react";
-import { websiteTemplates, defaultTemplateId } from "@/config/websiteTemplates";
+import { websiteTemplates, defaultTemplateId, getTemplate } from "@/config/websiteTemplates";
 
 import {
   useClinicSettings, useUpdateClinicSettings,
@@ -101,8 +101,11 @@ export default function WebsiteSettingsPage() {
   const selectedTemplate = (form.template as string) || (settings as any)?.template || defaultTemplateId;
 
   const handleSelectTemplate = (id: string) => {
-    setForm({ ...form, template: id });
-    handleSave({ template: id });
+    // Apply the template's palette too, otherwise previously saved colour
+    // overrides keep the old theme colours on the public site.
+    const palette = getTemplate(id).colors;
+    setForm({ ...form, template: id, primary_color: palette.primary, accent_color: palette.accent });
+    handleSave({ template: id, primary_color: palette.primary, accent_color: palette.accent });
   };
 
 
