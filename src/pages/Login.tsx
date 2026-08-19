@@ -180,7 +180,7 @@ export default function Login() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => { setEmail("demo@clinexus.com"); setPassword("Thepassword@48"); }}
+              onClick={() => { setEmail("demo@clinexus.com.ng"); setPassword("Thepassword@48"); }}
             >
               Try Demo
             </Button>
