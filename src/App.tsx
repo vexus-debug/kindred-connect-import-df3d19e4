@@ -10,6 +10,7 @@ import { OrgProvider } from "@/hooks/useOrg";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import SelectClinic from "./pages/SelectClinic";
 import NotFound from "./pages/NotFound";
 
@@ -112,6 +113,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/site/:slug" element={<PublicClinicSite />} />
             <Route path="/site/:slug/shop" element={<PublicShopPage />} />
             <Route path="/site/:slug/shop/:productId" element={<PublicProductPage />} />
