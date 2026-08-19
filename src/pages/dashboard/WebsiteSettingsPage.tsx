@@ -99,6 +99,7 @@ export default function WebsiteSettingsPage() {
   };
 
   const selectedTemplate = (form.template as string) || (settings as any)?.template || defaultTemplateId;
+  const templatePalette = getTemplate(selectedTemplate).colors;
 
   const handleSelectTemplate = (id: string) => {
     // Apply the template's palette too, otherwise previously saved colour
